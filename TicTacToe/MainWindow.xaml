@@ -8,7 +8,43 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-    </StackPanel>
+    
+    <Grid>
+        <Grid x:Name="AppTitleBar" Grid.Column="1" VerticalAlignment="Top" Background="Transparent" Height="28">
+            <Image Grid.Row="1" Grid.Column="1" Source="Assets/favicon.ico"
+                       HorizontalAlignment="Left"
+                       Width="16" Height="16" Margin="7,0" VerticalAlignment="Center"/>
+            <TextBlock Text="Tic Tac Toe" VerticalAlignment="Center" Margin="30,0,0,0" />
+        </Grid>
+        <Grid x:Name="ContentGrid" Margin="14,42,14,14">
+            <ComboBox SelectionChanged="Bot_Changed" PlaceholderText="Pick a Bot" Width="210">
+                <x:String>Random Bot</x:String>
+                <x:String>Pro Bot</x:String>
+            </ComboBox>
+            <Grid VerticalAlignment="Top" Margin="0,65,0,0">
+                <TextBlock FontFamily="Arial Rounded MT" FontSize="20" VerticalAlignment="Center" Text="Your Turn!"/>
+                <ProgressRing IsActive="True" HorizontalAlignment="Right"/>
+            </Grid>
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="14">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+                    <Button x:Name="no0" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no1" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no2" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+                    <Button x:Name="no3" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no4" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no5" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+                    <Button x:Name="no6" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no7" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="no8" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>
