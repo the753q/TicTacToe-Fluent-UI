@@ -16,35 +16,56 @@
                        Width="16" Height="16" Margin="7,0" VerticalAlignment="Center"/>
             <TextBlock Text="Tic Tac Toe" VerticalAlignment="Center" Margin="30,0,0,0" />
         </Grid>
+
+        <Grid x:Name="PlayerSelectionGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Margin="0,38,0,14" HorizontalAlignment="Center" FontFamily="Arial Rounded MT" FontSize="20" Text="Choose Player"/>
+
+            <Grid Grid.Row="1" ColumnSpacing="14" Margin="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="redChoose" Click="RedClick" FontSize="24" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">❌</Button>
+                <Button x:Name="greenChoose" Click="GreenClick" FontSize="24" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1">🟢</Button>
+            </Grid>
+        </Grid>
+
         <Grid x:Name="ContentGrid" Margin="14,42,14,14">
-            <ComboBox SelectionChanged="Bot_Changed" PlaceholderText="Pick a Bot" Width="210">
+            <ComboBox x:Name="BotSelector" SelectionChanged="Bot_Changed" PlaceholderText="Pick a Bot" Width="210">
                 <x:String>Random Bot</x:String>
                 <x:String>Pro Bot</x:String>
             </ComboBox>
             <Grid VerticalAlignment="Top" Margin="0,65,0,0">
-                <TextBlock FontFamily="Arial Rounded MT" FontSize="20" VerticalAlignment="Center" Text="Your Turn!"/>
-                <ProgressRing IsActive="True" HorizontalAlignment="Right"/>
+                <TextBlock x:Name="StatusText" FontFamily="Arial Rounded MT" FontSize="20" VerticalAlignment="Center" Text="Your Turn!"/>
+                <ProgressRing x:Name="StatusRing" IsActive="False" HorizontalAlignment="Right"/>
             </Grid>
 
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="14">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
-                    <Button x:Name="no0" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no1" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no2" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn0" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn1" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn2" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
-                    <Button x:Name="no3" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no4" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no5" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn3" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn4" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn5" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
-                    <Button x:Name="no6" Click="no1_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no7" Click="no2_Click" Width="60" Height="60" FontSize="24"></Button>
-                    <Button x:Name="no8" Click="no3_Click" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn6" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn7" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
+                    <Button x:Name="btn8" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
                 </StackPanel>
             </StackPanel>
         </Grid>
+        <TextBlock x:Name="TEMPtext" VerticalAlignment="Bottom" HorizontalAlignment="Right">test release</TextBlock>
     </Grid>
 </Window>
