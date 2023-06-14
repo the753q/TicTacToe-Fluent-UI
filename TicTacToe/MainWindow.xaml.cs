@@ -10,7 +10,9 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -21,10 +23,12 @@ using System.Xml.Linq;
 using TicTacToe;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media.Capture;
 using Windows.Security.Cryptography.Core;
 using Windows.UI.ViewManagement;
 using WinRT;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Net.WebRequestMethods;
 
 
 class WindowsSystemDispatcherQueueHelper
@@ -56,7 +60,7 @@ class WindowsSystemDispatcherQueueHelper
             options.threadType = 2;    // DQTYPE_THREAD_CURRENT
             options.apartmentType = 2; // DQTAT_COM_STA
 
-            CreateDispatcherQueueController(options, ref m_dispatcherQueueController);
+            _ = CreateDispatcherQueueController(options, ref m_dispatcherQueueController);
         }
     }
 }
@@ -72,7 +76,7 @@ namespace TicTacToe
 
         public MainWindow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             TrySetSystemBackdrop();
             InitializeWindow();
             InitializeGame();
@@ -158,19 +162,21 @@ namespace TicTacToe
             appWindow.SetIcon("Assets/favicon.ico");
         }
 
-        private int nextPlayer = 0;
-        private string bot = "None";
-        private int[] gameBoard = {0,0,0,0,0,0,0,0,0};
+
+        private string player = null;
+        private string nextPlayer = null;
+        private string bot = null;
+        private string[] gameBoard = new string[9];
 
         private void InitializeGame()
         {
             ContentGrid.Visibility = Visibility.Collapsed;
             PlayerSelectionGrid.Visibility = Visibility.Visible;
-            this.nextPlayer = 0;
-            this.bot = "None";
-            for(int i=0;i<gameBoard.Length;i++)
+            player = null;
+            nextPlayer = null;
+            for (int i = 0; i < gameBoard.Length; i++)
             {
-                this.gameBoard[i] = 0;
+                gameBoard[i] = null;
                 btn0.Content = "";
                 btn1.Content = "";
                 btn2.Content = "";
@@ -184,85 +190,152 @@ namespace TicTacToe
         }
 
         private void StartGame()
-        { 
+        {
             PlayerSelectionGrid.Visibility = Visibility.Collapsed;
             ContentGrid.Visibility = Visibility.Visible;
-            StatusText.Text = "Choose Bot!";
-            BotSelector.SelectedItem = null;
-            NextTurn();
-        }
-
-        private void NextTurn()
-        {
-            if(this.bot == "None") { return; }
-            if(this.nextPlayer == 1)
-            {
-                StatusText.Text = "Your Turn!";
-            }
-            else if (this.nextPlayer == 2)
-            {
-                StatusText.Text = "Bot's Turn";
-                StatusRing.IsActive = true;
-            }
+            if (bot == null) { StatusText.Text = "Choose Bot!"; }
+            else { NextTurn(); }
         }
 
         private void RedClick(object sender, RoutedEventArgs e)
         {
-            this.nextPlayer = 1;
+            player = "red";
+            nextPlayer = "player";
             StartGame();
         }
+
         private void GreenClick(object sender, RoutedEventArgs e)
         {
-            this.nextPlayer = 2;
+            player = "green";
+            nextPlayer = "bot";
             StartGame();
         }
+
+        private string TestBoardWin()
+        {
+            for (int start = 0; start < 3; start++)
+            {
+                string color = gameBoard[start];
+                if (color == null) { continue; }
+                if (start == 0)
+                {
+                    if (gameBoard[3] == color && gameBoard[6] == color) { return color; }
+                    if (gameBoard[4] == color && gameBoard[8] == color) { return color; }
+                    if (gameBoard[1] == color && gameBoard[2] == color) { return color; }
+                }
+                else if (start == 1)
+                {
+                    if (gameBoard[4] == color && gameBoard[7] == color) { return color; }
+                }
+                else
+                {
+                    if (gameBoard[4] == color && gameBoard[6] == color) { return color; }
+                    if (gameBoard[5] == color && gameBoard[8] == color) { return color; }
+                }
+            }
+            string color2 = gameBoard[6];
+            if (gameBoard[7] == color2 && gameBoard[8] == color2) { return color2; }
+            return null;
+        }
+
+        private bool IsGameWon()
+        {
+            string winner = TestBoardWin();
+            if (winner != null)
+            {
+                // END GAME
+                TEMPtext.Text = winner + " won!";
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsGameOver()
+        {
+            bool boardFilled = true;
+            for (int i = 0; i < 9; i++)
+            {
+                if (gameBoard[i] == null)
+                {
+                    boardFilled = false;
+                    break;
+                }
+            }
+            if (boardFilled || IsGameWon()) { return true; }
+            return false;
+        }
+
+        private void NextTurn()
+        {
+            if (bot == null || IsGameOver()) { return; }
+            if (nextPlayer == "player")
+            {
+                StatusText.Text = "Your Turn!";
+            }
+            else if (nextPlayer == "bot")
+            {
+                StatusText.Text = "Bot's Turn";
+                _ = UpdateBoard(4);
+                nextPlayer = "player";
+                NextTurn();
+            }
+        }
+
+
+        private void TileClick(object sender, RoutedEventArgs e)
+        {
+            if (bot == null || nextPlayer == "bot") { return; }
+            Button tile = (Button)sender;
+            var btnName = tile.Name;
+            int btnNumber = btnName[3] - '0';
+            if (UpdateBoard(btnNumber))
+            {
+                nextPlayer = "bot";
+                NextTurn();
+            }
+        }
+
+        private bool UpdateBoard(int btnNumber)
+        {
+            if (gameBoard[btnNumber] == null)
+            {
+                gameBoard[btnNumber] = nextPlayer;
+                string btnName = "btn" + btnNumber.ToString();
+                Button button = (Button)ButtonGrid.FindName(btnName);
+                if (button == null)
+                {
+                    Console.WriteLine("BUTTON NULL!");
+                    TEMPtext.Text = btnName + "Was null";
+                    return false;
+                }
+                if ((player == "red" && nextPlayer == "player") || (player == "green" && nextPlayer == "bot"))
+                {
+                    button.Content = "❌";
+                }
+                else
+                {
+                    button.Content = "🟢";
+                }
+                return true;
+            }
+            return false;
+        }
+
         private void Bot_Changed(object sender, RoutedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
             if (comboBox.SelectedItem == null) { return; }
             string selectedName = comboBox.SelectedItem.ToString();
             TEMPtext.Text = selectedName;
-            if(selectedName == this.bot) { return; }
-            if(this.bot == "None")
+            if (selectedName == bot) { return; }
+            if (bot == null)
             {
-                this.bot = selectedName;
+                bot = selectedName;
                 NextTurn();
                 return;
             }
+            bot = selectedName;
             InitializeGame();
-        }
-
-
-
-        private void TileClick(object sender, RoutedEventArgs e)
-        {
-            if(bot == "None") { return; }
-            Button tile = (Button) sender;
-            var btnName = tile.Name;
-            TEMPtext.Text = btnName;
-            if (UpdateBoard(btnName))
-            {
-                if (this.nextPlayer == 1)
-                {
-                    tile.Content = "❌";
-                }
-                else
-                {
-                    tile.Content = "🟢";
-                }
-            }
-        }
-
-        private bool UpdateBoard(string btnName)
-        {
-            int btnNumber = btnName[3] - '0';
-            if (btnNumber != 10 && gameBoard[btnNumber] == 0)
-            {
-                gameBoard[btnNumber] = nextPlayer;
-                return true;
-            }
-            return false;
-
         }
     }
 }

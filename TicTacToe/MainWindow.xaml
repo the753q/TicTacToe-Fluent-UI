@@ -43,10 +43,9 @@
             </ComboBox>
             <Grid VerticalAlignment="Top" Margin="0,65,0,0">
                 <TextBlock x:Name="StatusText" FontFamily="Arial Rounded MT" FontSize="20" VerticalAlignment="Center" Text="Your Turn!"/>
-                <ProgressRing x:Name="StatusRing" IsActive="False" HorizontalAlignment="Right"/>
             </Grid>
 
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="14">
+            <StackPanel x:Name="ButtonGrid" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="14">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
                     <Button x:Name="btn0" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
                     <Button x:Name="btn1" Click="TileClick" Width="60" Height="60" FontSize="24"></Button>
