@@ -16,11 +16,14 @@ using System.ComponentModel.Design;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Xml.Linq;
 using TicTacToe;
+using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Capture;
@@ -172,6 +175,7 @@ namespace TicTacToe
         {
             ContentGrid.Visibility = Visibility.Collapsed;
             PlayerSelectionGrid.Visibility = Visibility.Visible;
+            ResetBtn.Visibility = Visibility.Collapsed;
             player = null;
             nextPlayer = null;
             for (int i = 0; i < gameBoard.Length; i++)
@@ -200,14 +204,14 @@ namespace TicTacToe
         private void RedClick(object sender, RoutedEventArgs e)
         {
             player = "red";
-            nextPlayer = "player";
+            nextPlayer = "Player";
             StartGame();
         }
 
         private void GreenClick(object sender, RoutedEventArgs e)
         {
             player = "green";
-            nextPlayer = "bot";
+            nextPlayer = "Bot";
             StartGame();
         }
 
@@ -245,6 +249,7 @@ namespace TicTacToe
             {
                 // END GAME
                 TEMPtext.Text = winner + " won!";
+                StatusText.Text = winner + " won!";
                 return true;
             }
             return false;
@@ -252,31 +257,64 @@ namespace TicTacToe
 
         private bool IsGameOver()
         {
-            bool boardFilled = true;
-            for (int i = 0; i < 9; i++)
+            bool isWon = false;
+            if (IsGameWon()) { isWon = true; }
+            if (!isWon)
             {
-                if (gameBoard[i] == null)
+                bool boardFilled = true;
+                for (int i = 0; i < 9; i++)
                 {
-                    boardFilled = false;
-                    break;
+                    if (gameBoard[i] == null)
+                    {
+                        boardFilled = false;
+                        break;
+                    }
+                }
+                if (boardFilled)
+                {
+                    TEMPtext.Text = "Tie!";
+                    StatusText.Text = "It's a tie!";
+                    isWon = true;
                 }
             }
-            if (boardFilled || IsGameWon()) { return true; }
+            if (isWon) 
+            {
+                ResetBtn.Visibility = Visibility.Visible;
+                return true;
+            }
             return false;
+        }
+
+
+        private void RandomBot()
+        {
+            var rand = new Random();
+            bool moveSuccessful = false;
+            while (!moveSuccessful)
+            {
+                moveSuccessful = UpdateBoard(rand.Next(9));
+            }
+        }
+
+        private void ProBot()
+        {
+            _ = UpdateBoard(4);
         }
 
         private void NextTurn()
         {
             if (bot == null || IsGameOver()) { return; }
-            if (nextPlayer == "player")
+            if (nextPlayer == "Player")
             {
                 StatusText.Text = "Your Turn!";
             }
-            else if (nextPlayer == "bot")
+            else if (nextPlayer == "Bot")
             {
                 StatusText.Text = "Bot's Turn";
-                _ = UpdateBoard(4);
-                nextPlayer = "player";
+                TEMPtext.Text = bot;
+                if (bot == "Random Bot") { RandomBot(); }
+                else { ProBot(); }
+                nextPlayer = "Player";
                 NextTurn();
             }
         }
@@ -284,20 +322,20 @@ namespace TicTacToe
 
         private void TileClick(object sender, RoutedEventArgs e)
         {
-            if (bot == null || nextPlayer == "bot") { return; }
+            if (bot == null || nextPlayer == "Bot") { return; }
             Button tile = (Button)sender;
             var btnName = tile.Name;
             int btnNumber = btnName[3] - '0';
             if (UpdateBoard(btnNumber))
             {
-                nextPlayer = "bot";
+                nextPlayer = "Bot";
                 NextTurn();
             }
         }
 
         private bool UpdateBoard(int btnNumber)
         {
-            if (gameBoard[btnNumber] == null)
+            if (gameBoard[btnNumber] == null && !IsGameOver())
             {
                 gameBoard[btnNumber] = nextPlayer;
                 string btnName = "btn" + btnNumber.ToString();
@@ -308,7 +346,7 @@ namespace TicTacToe
                     TEMPtext.Text = btnName + "Was null";
                     return false;
                 }
-                if ((player == "red" && nextPlayer == "player") || (player == "green" && nextPlayer == "bot"))
+                if ((player == "red" && nextPlayer == "Player") || (player == "green" && nextPlayer == "Bot"))
                 {
                     button.Content = "❌";
                 }
@@ -335,6 +373,11 @@ namespace TicTacToe
                 return;
             }
             bot = selectedName;
+            InitializeGame();
+        }
+
+        private void ResetClick(object sender, RoutedEventArgs e)
+        {
             InitializeGame();
         }
     }
