@@ -5,3 +5,7 @@ Simple game made with Fluent UI in mind.
 
 # Usage
 Made for Windows 11, support for other versions is not guaranteed.
+
+# To-Do
+- Implement Pro Bot that makes a move that has the highest chance of leading to a win.
+- Release a .exe package
