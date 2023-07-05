@@ -7,6 +7,7 @@ Simple game made with Fluent UI in mind.
 Made for Windows 11, support for other versions is not guaranteed.
 
 # To-Do
+- Fix win when a player has dots horizontally in the center
 - Implement Pro Bot that makes a move that has the highest chance of leading to a win
 - Remove maximize button and behavior
 - Release in a single .exe file
